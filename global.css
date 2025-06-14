@@ -1,9 +1,13 @@
+/* Import your generated Token Studio tokens */
+@import './tokens/build/tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
+    /* React Native Reusables default variables */
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
@@ -23,6 +27,14 @@
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
     --ring: 240 5.9% 10%;
+    
+    /* Your Token Studio design tokens are now available as CSS variables */
+    /* Examples from your tokens: */
+    /* --global-shadow-l1, --global-shadow-l2, etc. */
+    /* --global-fontfamilies-roc-grotesk, --global-fontfamilies-open-sans */
+    /* --global-fontsize-0 through --global-fontsize-29 */
+    /* --spacing-mode-1-space-xs, --spacing-mode-1-space-s, etc. */
+    /* --border-mode-1-radius-xs, --border-mode-1-radius-s, etc. */
   }
 
   .dark:root {
