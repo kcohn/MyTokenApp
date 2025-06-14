@@ -1,16 +1,13 @@
-// tokens/simple-build.mjs
+// tokens/fixed-build.mjs
 import fs from 'fs';
 
-async function buildSimpleTokens() {
-  console.log('🎨 Building design tokens (simple version)...');
+async function buildFixedTokens() {
+  console.log('🎨 Building design tokens (fixed version)...');
   
-  // Read your Token Studio file
   const tokensData = JSON.parse(fs.readFileSync('tokens/tokens.json', 'utf8'));
-  
   const cssVariables = [];
   const jsTokens = {};
   
-  // Process each section of your tokens
   function processSection(sectionData, sectionName) {
     console.log(`📦 Processing: ${sectionName}`);
     
@@ -31,7 +28,13 @@ async function buildSimpleTokens() {
             continue;
           }
           
-          const tokenName = [...pathArray, key].join('-').replace(/[^a-z0-9-]/g, '-');
+          // Generate a clean token name
+          const tokenName = [...pathArray, key]
+            .join('-')
+            .replace(/[^a-z0-9-]/g, '-')
+            .replace(/--+/g, '-') // Replace multiple dashes with single dash
+            .toLowerCase();
+          
           const cssVarName = `--${tokenName}`;
           
           let cssValue = value.$value;
@@ -54,8 +57,11 @@ async function buildSimpleTokens() {
             case 'spacing':
             case 'fontSizes':
             case 'lineHeights':
-              if (typeof cssValue === 'string' && !cssValue.includes('px')) {
-                cssValue = `${parseFloat(cssValue)}px`;
+              if (typeof cssValue === 'string' && !cssValue.includes('px') && !cssValue.includes('%')) {
+                const numValue = parseFloat(cssValue);
+                if (!isNaN(numValue)) {
+                  cssValue = `${numValue}px`;
+                }
               }
               break;
               
@@ -71,18 +77,37 @@ async function buildSimpleTokens() {
               };
               cssValue = weightMap[cssValue] || cssValue;
               break;
+              
+            case 'text':
+              // For text tokens, keep as-is but add quotes for font families
+              if (pathArray.some(part => part.includes('family'))) {
+                cssValue = `"${cssValue}"`;
+              }
+              break;
           }
           
           cssVariables.push(`  ${cssVarName}: ${cssValue};`);
           
-          // Also store in JS object
-          const keys = tokenName.split('-');
+          // Store in JS object - but only create the structure, don't try to assign to strings
+          const keys = tokenName.split('-').filter(k => k.length > 0);
           let current = jsTokens;
-          for (let i = 0; i < keys.length - 1; i++) {
-            if (!current[keys[i]]) current[keys[i]] = {};
-            current = current[keys[i]];
+          
+          try {
+            for (let i = 0; i < keys.length - 1; i++) {
+              const keyName = keys[i];
+              if (!current[keyName] || typeof current[keyName] !== 'object') {
+                current[keyName] = {};
+              }
+              current = current[keyName];
+            }
+            
+            const finalKey = keys[keys.length - 1];
+            if (finalKey && typeof current === 'object') {
+              current[finalKey] = cssValue;
+            }
+          } catch (error) {
+            console.log(`Warning: Could not create JS structure for ${tokenName}`);
           }
-          current[keys[keys.length - 1]] = cssValue;
           
         } else {
           // Recurse into nested groups
@@ -101,6 +126,10 @@ async function buildSimpleTokens() {
     processSection(tokensData['Color/Light'], 'color-light');
   }
   
+  if (tokensData['Primitive: Type/Mode 1']) {
+    processSection(tokensData['Primitive: Type/Mode 1'], 'primitive-type-mode-1');
+  }
+  
   if (tokensData['Spacing/Mode 1']) {
     processSection(tokensData['Spacing/Mode 1'], 'spacing-mode-1');
   }
@@ -111,6 +140,10 @@ async function buildSimpleTokens() {
   
   if (tokensData['Unit/Mode 1']) {
     processSection(tokensData['Unit/Mode 1'], 'unit-mode-1');
+  }
+  
+  if (tokensData['Layout/Mode 1']) {
+    processSection(tokensData['Layout/Mode 1'], 'layout-mode-1');
   }
   
   // Create build directory
@@ -132,7 +165,7 @@ export default tokens;`;
   
   fs.writeFileSync(`${buildDir}/tokens.js`, jsContent);
   
-  console.log('✅ Simple tokens built successfully!');
+  console.log('✅ Fixed tokens built successfully!');
   console.log(`📊 Generated ${cssVariables.length} CSS variables`);
   console.log('📁 Files created:');
   console.log('   - tokens/build/tokens.css');
@@ -148,4 +181,4 @@ export default tokens;`;
   }
 }
 
-buildSimpleTokens().catch(console.error);
+buildFixedTokens().catch(console.error);
