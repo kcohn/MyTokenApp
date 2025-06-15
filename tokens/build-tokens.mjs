@@ -1,4 +1,4 @@
-// tokens/fixed-build.mjs
+// tokens/build-tokens.mjs
 import fs from 'fs';
 
 async function buildFixedTokens() {
@@ -28,12 +28,17 @@ async function buildFixedTokens() {
             continue;
           }
           
-          // Generate a clean token name
+          // Generate a clean token name - FIXED VERSION
           const tokenName = [...pathArray, key]
+            .map(part => 
+              part
+                .replace(/\s+/g, '-')        // Replace spaces with dashes
+                .replace(/[^a-zA-Z0-9-]/g, '-') // Replace special chars but keep letters
+                .toLowerCase()               // Convert to lowercase AFTER replacing
+            )
             .join('-')
-            .replace(/[^a-z0-9-]/g, '-')
-            .replace(/--+/g, '-') // Replace multiple dashes with single dash
-            .toLowerCase();
+            .replace(/--+/g, '-')            // Replace multiple dashes with single dash
+            .replace(/^-+|-+$/g, '');        // Remove leading/trailing dashes
           
           const cssVarName = `--${tokenName}`;
           
@@ -88,7 +93,7 @@ async function buildFixedTokens() {
           
           cssVariables.push(`  ${cssVarName}: ${cssValue};`);
           
-          // Store in JS object - but only create the structure, don't try to assign to strings
+          // Store in JS object
           const keys = tokenName.split('-').filter(k => k.length > 0);
           let current = jsTokens;
           

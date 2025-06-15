@@ -90,6 +90,33 @@ export default function Screen() {
           </Button>
         </CardFooter>
       </Card>
+      <View style={{
+        marginTop: 24,
+        padding: 'var(--spacing-mode-1-space-l, 16px)', // This will use your token!
+        backgroundColor: '#f1f5f9',
+        borderRadius: 'var(--border-mode-1-radius-s, 8px)',
+        borderWidth: 'var(--border-mode-1-width-xs, 1px)',
+        borderColor: '#e2e8f0',
+        alignItems: 'center',
+        maxWidth: 'calc(100% - 48px)',
+      }}>
+      <Text style={{ 
+        fontSize: 16, 
+        fontWeight: '600', 
+        color: '#1e293b',
+        marginBottom: 8
+      }}>
+        🎨 Token Studio Test
+      </Text>
+      <Text style={{ 
+        fontSize: 14, 
+        color: '#64748b',
+        textAlign: 'center'
+      }}>
+        This element uses spacing token: var(--spacing-mode-1-space-l)
+        {'\n'}Current value should be 16px
+      </Text>
+</View> 
     </View>
   );
 }

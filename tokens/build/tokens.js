@@ -4,35 +4,37 @@ export const tokens = {
       "mode": {
         "1": {
           "weight": {
-            "old": {
-              "talic": "Bold Italic"
+            "bold": {
+              "italic": "Bold Italic"
             },
-            "emibold": {
-              "talic": "Semibold Italic"
+            "semibold": {
+              "italic": "Semibold Italic"
             },
-            "edium": {
-              "talic": "Medium Italic"
+            "medium": {
+              "italic": "Medium Italic"
             },
-            "egular": "Regular",
-            "ight": {
-              "talic": "Light Italic"
+            "regular": "Regular",
+            "light": {
+              "italic": "Light Italic"
             },
-            "talic": "Italic"
+            "italic": "Italic"
           },
           "family": {
-            "pen": {
-              "ans": "\"Open Sans\""
+            "open": {
+              "sans": "\"Open Sans\""
             },
-            "oc": {
-              "rotesk": "\"Roc Grotesk\""
+            "roc": {
+              "grotesk": "\"Roc Grotesk\""
             },
-            "lbert": {
-              "ans": "\"Albert Sans\""
+            "albert": {
+              "sans": "\"Albert Sans\""
             }
           },
           "letter": {
             "spacing": {
-              "one": "0px"
+              "s": "-0.5px",
+              "xs": "-1px",
+              "none": "0px"
             }
           }
         }
@@ -43,11 +45,24 @@ export const tokens = {
     "mode": {
       "1": {
         "space": {
-          "2": "2px",
-          "4": "48px",
-          "5": "56px",
-          "7": "72px",
-          "ticky": {
+          "3xl": "40px",
+          "xl": "24px",
+          "m": "12px",
+          "2xl": "32px",
+          "11xl": "104px",
+          "l": "16px",
+          "s": "8px",
+          "10xl": "96px",
+          "8xl": "80px",
+          "9xl": "88px",
+          "6xl": "64px",
+          "12xl": "112px",
+          "xs": "4px",
+          "7xl": "72px",
+          "4xl": "48px",
+          "5xl": "56px",
+          "2xs": "2px",
+          "sticky": {
             "footer": "170px"
           }
         }
@@ -57,8 +72,22 @@ export const tokens = {
   "border": {
     "mode": {
       "1": {
-        "width": "3px",
-        "radius": "4px"
+        "width": {
+          "xs": "1px",
+          "xl": "8px",
+          "l": "4px",
+          "m": "2px",
+          "s": "1.5px",
+          "ml": "3px"
+        },
+        "radius": {
+          "pill": "999px",
+          "l": "16px",
+          "s": "8px",
+          "circle": "50px",
+          "m": "12px",
+          "xs": "4px"
+        }
       }
     }
   },
@@ -98,7 +127,12 @@ export const tokens = {
   "layout": {
     "mode": {
       "1": {
-        "breakpoint": "393px"
+        "breakpoint": {
+          "xl": "1440px",
+          "l": "1024px",
+          "m": "768px",
+          "s": "393px"
+        }
       }
     }
   }
