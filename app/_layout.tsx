@@ -53,6 +53,13 @@ export default function RootLayout() {
             presentation: 'fullScreen',
           }}
         />
+       <Stack.Screen
+        name='shadcn-demo'
+        options={{
+          title: 'shadecn/ui Demo',
+          presentation: 'fullScreen',
+        }}
+      /> 
       </Stack>
       <PortalHost />
     </ThemeProvider>

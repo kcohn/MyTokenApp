@@ -34,7 +34,7 @@ export default function Screen() {
     <View style={styles.container}>
       <Card style={styles.card}>
         <CardHeader style={styles.cardHeader}>
-          <Avatar style={styles.avatar}>
+          <Avatar style={styles.avatar} alt={''}>
             <AvatarImage source={{ uri: GITHUB_AVATAR_URI }} />
             <AvatarFallback>
               <Text>RS</Text>
@@ -96,16 +96,15 @@ export default function Screen() {
         </CardFooter>
       </Card>
       
-      <View style={styles.tokenTest}>
-        <Text style={styles.tokenTitle}>🎨 Token Studio Integration</Text>
-        <Text style={styles.tokenDescription}>
-          This app now uses your Figma design tokens!
-          {'\n'}• Spacing: {spacing.l}px (--spacing-mode-1-space-l)
-          {'\n'}• Border Radius: {borderRadius.s}px (--border-mode-1-radius-s)
-          {'\n'}• Border Width: {borderWidth.xs}px (--border-mode-1-width-xs)
-        </Text>
+      {/* Design System Button */}
+      <Button 
+        variant="outline" 
+        className="mt-4"
+        onPress={() => router.push('/shadecn-demo')}
+      >
+        <Text>🎨 View shadcn/ui Components</Text>
+      </Button>
       </View> 
-    </View>
   );
 }
 
