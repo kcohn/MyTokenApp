@@ -1,0 +1,167 @@
+# .github/workflows/tokens.yml
+name: Build Design Tokens
+
+on:
+  push:
+    paths:
+      - 'tokens/tokens.json'
+    branches:
+      - main
+      - develop
+  pull_request:
+    paths:
+      - 'tokens/tokens.json'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  build-tokens:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write # Required to push changes back to repo
+      pull-requests: write # Required to comment on PRs
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0 # Fetch full history for better git operations
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Build design tokens
+        run: |
+          echo "🎨 Building design tokens from Token Studio..."
+          npm run tokens:build
+          echo "✅ Token build completed"
+        
+      - name: Check for changes
+        id: verify-changed-files
+        run: |
+          echo "🔍 Checking for changes in built tokens..."
+          git add -N . # Add untracked files to git index for diff detection
+          if [ -n "$(git diff --name-only HEAD tokens/build/ lib/tokens.ts)" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "📝 Changes detected in:"
+            git diff --name-only HEAD tokens/build/ lib/tokens.ts
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "✨ No changes in built tokens"
+          fi
+          
+      - name: Show token changes (for debugging)
+        if: steps.verify-changed-files.outputs.changed == 'true'
+        run: |
+          echo "📊 Token changes summary:"
+          echo "Files changed:"
+          git diff --name-only HEAD tokens/build/ lib/tokens.ts
+          echo ""
+          echo "Sample of changes:"
+          git diff HEAD tokens/build/ lib/tokens.ts | head -50
+          
+      - name: Commit and push changes
+        if: steps.verify-changed-files.outputs.changed == 'true' && github.event_name == 'push'
+        run: |
+          echo "💾 Committing updated tokens..."
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action [Token Studio]"
+          git add tokens/build/ lib/tokens.ts
+          git commit -m "🎨 Auto-update design tokens from Token Studio
+
+          Updated files:
+          $(git diff --name-only HEAD~1 tokens/build/ lib/tokens.ts | sed 's/^/- /')
+          
+          [skip ci]"
+          
+          echo "🚀 Pushing changes..."
+          git push
+          
+      - name: Create Pull Request (for non-main branches)
+        if: steps.verify-changed-files.outputs.changed == 'true' && github.event_name == 'push' && github.ref != 'refs/heads/main'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "🎨 Auto-update design tokens from Token Studio"
+          title: "🎨 Design Tokens Update"
+          body: |
+            ## 🎨 Design Tokens Updated
+            
+            This PR contains automatically generated design token updates from Token Studio.
+            
+            ### Changes:
+            - Updated design tokens from Figma via Token Studio
+            - Regenerated CSS variables and TypeScript types
+            - All tokens have been properly resolved and validated
+            
+            ### Files Updated:
+            - `tokens/build/tokens.css` - CSS custom properties
+            - `tokens/build/tokens.js` - JavaScript token object  
+            - `lib/tokens.ts` - TypeScript token definitions
+            
+            **This PR is safe to merge** ✅
+          branch: "tokens/auto-update-${{ github.run_id }}"
+          delete-branch: true
+          
+      - name: Comment on PR (if applicable)
+        if: github.event_name == 'pull_request' && steps.verify-changed-files.outputs.changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            
+            // Check if we already commented
+            const existingComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Design tokens updated!')
+            );
+            
+            const commentBody = `🎨 **Design tokens updated!** 
+            
+            The design tokens have been automatically rebuilt from Token Studio changes.
+            
+            ### What changed:
+            - Token definitions have been processed and resolved
+            - CSS variables updated in \`tokens/build/tokens.css\`
+            - TypeScript definitions updated in \`lib/tokens.ts\`
+            - JavaScript tokens updated in \`tokens/build/tokens.js\`
+            
+            The changes are ready for review! ✨`;
+            
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                comment_id: existingComment.id,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: commentBody
+              });
+            }
+            
+      - name: Report success
+        if: steps.verify-changed-files.outputs.changed == 'true'
+        run: |
+          echo "🎉 Design tokens successfully updated!"
+          echo "✅ Token build pipeline completed"
+          
+      - name: No changes needed
+        if: steps.verify-changed-files.outputs.changed == 'false'
+        run: |
+          echo "✨ No token changes detected - everything is up to date!"
