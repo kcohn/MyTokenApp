@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useRouter } from 'expo-router';
-
 import { View } from 'react-native';
 import Animated, { FadeInUp, FadeOutDown, LayoutAnimationConfig } from 'react-native-reanimated';
 import { Info } from '~/lib/icons/Info';
@@ -23,12 +22,34 @@ const router = useRouter();
 const GITHUB_AVATAR_URI =
   'https://i.pinimg.com/originals/ef/a2/8d/efa28d18a04e7fa40ed49eeb0ab660db.jpg';
 
+// In development, you can toggle between app and Storybook
+const StorybookToggle = () => {
+  if (!__DEV__) return null;
+  
+  const toggleStorybook = () => {
+    // This would require app restart to take effect
+    // You'll need to manually change SHOW_STORYBOOK in index.js and restart
+    alert('To view Storybook:\n1. Set SHOW_STORYBOOK=true in index.js\n2. Restart the app');
+  };
+
+  return (
+    <Button 
+      variant="outline" 
+      className="mt-4"
+      onPress={toggleStorybook}
+    >
+      <Text>📚 View Storybook</Text>
+    </Button>
+  );
+};
+
 export default function Screen() {
   const [progress, setProgress] = React.useState(78);
 
   function updateProgressValue() {
     setProgress(Math.floor(Math.random() * 100));
   }
+  
   return (
     <View className='flex-1 justify-center items-center gap-5 p-6 bg-secondary/30'>
       <Card className='w-full max-w-sm p-6 rounded-2xl'>
@@ -94,16 +115,12 @@ export default function Screen() {
           </Button>
         </CardFooter>
       </Card>
-      <Button 
-  variant="outline" 
-  className="mt-4"
-  onPress={() => router.push('/stories')}
->
-  <Text>🎨 View Design System</Text>
-</Button> 
+      
+      <StorybookToggle />
+      
       <View style={{
         marginTop: 24,
-        padding: 'var(--spacing-mode-1-space-l, 16px)', // This will use your token!
+        padding: 'var(--spacing-mode-1-space-l, 16px)',
         backgroundColor: '#f1f5f9',
         borderRadius: 'var(--border-mode-1-radius-s, 8px)',
         borderWidth: 'var(--border-mode-1-width-xs, 1px)',
@@ -111,45 +128,23 @@ export default function Screen() {
         alignItems: 'center',
         maxWidth: 'calc(100% - 48px)',
       }}>
-      <Text style={{ 
-        fontSize: 16, 
-        fontWeight: '600', 
-        color: '#1e293b',
-        marginBottom: 8
-      }}>
-        🎨 Token Studio Test
-      </Text>
-      <Text style={{ 
-        fontSize: 14, 
-        color: '#64748b',
-        textAlign: 'center'
-      }}>
-        This element uses spacing token: var(--spacing-mode-1-space-l)
-        {'\n'}Current value should be 16px
-      </Text>
-</View> 
+        <Text style={{ 
+          fontSize: 16, 
+          fontWeight: '600', 
+          color: '#1e293b',
+          marginBottom: 8
+        }}>
+          🎨 Token Studio Test
+        </Text>
+        <Text style={{ 
+          fontSize: 14, 
+          color: '#64748b',
+          textAlign: 'center'
+        }}>
+          This element uses spacing token: var(--spacing-mode-1-space-l)
+          {'\n'}Current value should be 16px
+        </Text>
+      </View> 
     </View>
   );
 }
-
-// App.tsx (in root directory)
-// import { registerRootComponent } from 'expo';
-
-// // Toggle between app and storybook
-// const SHOW_STORYBOOK = __DEV__ && true; // Set to false for main app
-
-// if (SHOW_STORYBOOK) {
-//   // Import and register Storybook
-//   const StorybookUIRoot = require('./.storybook/index.js').default;
-//   registerRootComponent(StorybookUIRoot);
-// } else {
-//   // Import and register main app  
-//   const { ExpoRoot } = require('expo-router');
-  
-//   function App() {
-//     const ctx = require.context('./app');
-//     return ExpoRoot({ context: ctx });
-//   }
-  
-//   registerRootComponent(App);
-// }

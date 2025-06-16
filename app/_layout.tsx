@@ -46,6 +46,13 @@ export default function RootLayout() {
             headerRight: () => <ThemeToggle />,
           }}
         />
+        <Stack.Screen
+          name='stories'
+          options={{
+            title: 'Design System',
+            presentation: 'fullScreen',
+          }}
+        />
       </Stack>
       <PortalHost />
     </ThemeProvider>
