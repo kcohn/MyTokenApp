@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { useRouter } from 'expo-router';
+
 import { View } from 'react-native';
 import Animated, { FadeInUp, FadeOutDown, LayoutAnimationConfig } from 'react-native-reanimated';
 import { Info } from '~/lib/icons/Info';
@@ -15,6 +17,8 @@ import {
 import { Progress } from '~/components/ui/progress';
 import { Text } from '~/components/ui/text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip';
+
+const router = useRouter();
 
 const GITHUB_AVATAR_URI =
   'https://i.pinimg.com/originals/ef/a2/8d/efa28d18a04e7fa40ed49eeb0ab660db.jpg';
@@ -90,6 +94,13 @@ export default function Screen() {
           </Button>
         </CardFooter>
       </Card>
+      <Button 
+  variant="outline" 
+  className="mt-4"
+  onPress={() => router.push('/stories')}
+>
+  <Text>🎨 View Design System</Text>
+</Button> 
       <View style={{
         marginTop: 24,
         padding: 'var(--spacing-mode-1-space-l, 16px)', // This will use your token!
@@ -120,3 +131,25 @@ export default function Screen() {
     </View>
   );
 }
+
+// App.tsx (in root directory)
+// import { registerRootComponent } from 'expo';
+
+// // Toggle between app and storybook
+// const SHOW_STORYBOOK = __DEV__ && true; // Set to false for main app
+
+// if (SHOW_STORYBOOK) {
+//   // Import and register Storybook
+//   const StorybookUIRoot = require('./.storybook/index.js').default;
+//   registerRootComponent(StorybookUIRoot);
+// } else {
+//   // Import and register main app  
+//   const { ExpoRoot } = require('expo-router');
+  
+//   function App() {
+//     const ctx = require.context('./app');
+//     return ExpoRoot({ context: ctx });
+//   }
+  
+//   registerRootComponent(App);
+// }
