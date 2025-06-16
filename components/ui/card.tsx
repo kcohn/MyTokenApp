@@ -1,7 +1,17 @@
+// components/ui/card.tsx - Enhanced with more design tokens
 import * as React from 'react';
 import { Text, TextProps, View, ViewProps, StyleSheet } from 'react-native';
 import { TextClassContext } from '~/components/ui/text';
-import { spacing, borderRadius, borderWidth } from '~/lib/tokens';
+import { 
+  spacing, 
+  borderRadius, 
+  borderWidth, 
+  typography, 
+  fontFamily, 
+  fontWeight,
+  shadows,
+  colors 
+} from '~/lib/tokens';
 
 function Card({
   style,
@@ -97,53 +107,55 @@ function CardFooter({
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: borderRadius.s,    // 8px from your tokens
-    borderWidth: borderWidth.xs,     // 1px from your tokens
-    borderColor: '#e5e5e5',
-    backgroundColor: '#ffffff',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    borderRadius: borderRadius.s,            // 8px from your tokens
+    borderWidth: borderWidth.xs,             // 1px from your tokens
+    borderColor: colors.border.primary,      // Using your border color tokens
+    backgroundColor: colors.background.primary, // Using your background color tokens
+    ...shadows.md,                           // Using your medium shadow tokens
   },
+  
   header: {
     flexDirection: 'column',
-    paddingTop: spacing.xl,          // 24px from your tokens
-    paddingHorizontal: spacing.xl,   // 24px from your tokens
-    paddingBottom: spacing.xs,       // 4px from your tokens (reduced spacing)
+    paddingTop: spacing.xl,                  // 24px from your tokens
+    paddingHorizontal: spacing.xl,           // 24px from your tokens
+    paddingBottom: spacing.xs,               // 4px from your tokens
   },
+  
   title: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#18181b',
-    lineHeight: 24,
-    marginBottom: spacing.xs,        // 4px from your tokens
+    ...typography.headingS,                  // Using your heading S typography tokens
+    fontFamily: fontFamily.rocGrotesk,       // Using your brand font family
+    fontWeight: fontWeight.semibold,         // Using your semibold weight token
+    color: colors.text.primary,              // Using your primary text color
+    marginBottom: spacing.xs,                // 4px from your tokens
   },
+  
   description: {
-    fontSize: 14,
-    color: '#71717a',
-    lineHeight: 20,
+    ...typography.textM,                     // Using your text M typography tokens
+    fontFamily: fontFamily.openSans,         // Using Open Sans for body text
+    fontWeight: fontWeight.regular,          // Using your regular weight token
+    color: colors.text.secondary,            // Using your secondary text color
   },
+  
   content: {
-    paddingHorizontal: spacing.xl,   // 24px from your tokens
-    paddingTop: 0,
-    paddingBottom: spacing.xl,       // 24px from your tokens
+    paddingHorizontal: spacing.xl,           // 24px from your tokens
+    paddingTop: spacing.s,                   // 8px from your tokens
+    paddingBottom: spacing.xl,               // 24px from your tokens
   },
+  
   contentText: {
-    color: '#18181b',
-    fontSize: 14,
-    lineHeight: 20,
+    ...typography.textM,                     // Using your text M typography tokens
+    fontFamily: fontFamily.openSans,         // Using Open Sans for content
+    fontWeight: fontWeight.regular,          // Using your regular weight token
+    color: colors.text.primary,              // Using your primary text color
   },
+  
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: spacing.xl,   // 24px from your tokens
+    gap: spacing.s,                          // 8px gap using your tokens
+    paddingHorizontal: spacing.xl,           // 24px from your tokens
     paddingTop: 0,
-    paddingBottom: spacing.xl,       // 24px from your tokens
+    paddingBottom: spacing.xl,               // 24px from your tokens
   },
 });
 

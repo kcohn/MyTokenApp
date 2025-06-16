@@ -1,9 +1,18 @@
+// components/ui/alert.tsx - Enhanced with design tokens
 import * as React from 'react';
 import { View, ViewProps, StyleSheet } from 'react-native';
-import { Text } from './text';
-import { spacing, borderRadius, borderWidth } from '~/lib/tokens';
+import { Text, Body } from './text';
+import { 
+  spacing, 
+  borderRadius, 
+  borderWidth,
+  typography,
+  fontFamily,
+  fontWeight,
+  colors 
+} from '~/lib/tokens';
 
-type AlertVariant = 'default' | 'destructive' | 'success' | 'warning';
+type AlertVariant = 'default' | 'destructive' | 'success' | 'warning' | 'info';
 
 interface AlertProps extends ViewProps {
   variant?: AlertVariant;
@@ -37,7 +46,12 @@ function Alert({ variant = 'default', style, children, ...props }: AlertProps) {
 
 function AlertTitle({ children, style }: AlertTitleProps) {
   return (
-    <Text style={[styles.title, style]}>
+    <Text 
+      variant="textM"
+      weight="semibold"
+      fontFamily="rocGrotesk"
+      style={[styles.title, style]}
+    >
       {children}
     </Text>
   );
@@ -45,45 +59,66 @@ function AlertTitle({ children, style }: AlertTitleProps) {
 
 function AlertDescription({ children, style }: AlertDescriptionProps) {
   return (
-    <Text style={[styles.description, style]}>
+    <Body 
+      size="s" 
+      color="secondary"
+      style={[styles.description, style]}
+    >
       {children}
-    </Text>
+    </Body>
   );
 }
 
+const getVariantStyles = (variant: AlertVariant) => {
+  switch (variant) {
+    case 'destructive':
+      return {
+        backgroundColor: colors.semantic.error + '10', // Adding transparency
+        borderColor: colors.semantic.error + '40',
+      };
+    case 'success':
+      return {
+        backgroundColor: colors.semantic.success + '10',
+        borderColor: colors.semantic.success + '40',
+      };
+    case 'warning':
+      return {
+        backgroundColor: colors.semantic.warning + '10',
+        borderColor: colors.semantic.warning + '40',
+      };
+    case 'info':
+      return {
+        backgroundColor: colors.semantic.info + '10',
+        borderColor: colors.semantic.info + '40',
+      };
+    default:
+      return {
+        backgroundColor: colors.background.primary,
+        borderColor: colors.border.primary,
+      };
+  }
+};
+
 const styles = StyleSheet.create({
   base: {
-    borderRadius: borderRadius.s,     // 8px from your tokens
-    borderWidth: borderWidth.xs,      // 1px from your tokens
-    padding: spacing.l,               // 16px from your tokens
-    gap: spacing.xs,                  // 4px from your tokens
+    borderRadius: borderRadius.s,        // 8px from your tokens
+    borderWidth: borderWidth.xs,         // 1px from your tokens
+    padding: spacing.l,                  // 16px from your tokens
+    gap: spacing.xs,                     // 4px from your tokens
   },
-  default: {
-    backgroundColor: '#ffffff',
-    borderColor: '#e4e4e7',
-  },
-  destructive: {
-    backgroundColor: '#fef2f2',
-    borderColor: '#fecaca',
-  },
-  success: {
-    backgroundColor: '#f0fdf4',
-    borderColor: '#bbf7d0',
-  },
-  warning: {
-    backgroundColor: '#fffbeb',
-    borderColor: '#fed7aa',
-  },
+  
+  default: getVariantStyles('default'),
+  destructive: getVariantStyles('destructive'),
+  success: getVariantStyles('success'),
+  warning: getVariantStyles('warning'),
+  info: getVariantStyles('info'),
+  
   title: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#18181b',
-    lineHeight: 20,
+    marginBottom: spacing.xs,            // 4px from your tokens
   },
+  
   description: {
-    fontSize: 14,
-    color: '#71717a',
-    lineHeight: 20,
+    // Description styles handled by Body component
   },
 });
 

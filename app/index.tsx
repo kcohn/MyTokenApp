@@ -1,6 +1,7 @@
+// app/index.tsx - Enhanced with Student Loan Card
 import * as React from 'react';
 import { useRouter } from 'expo-router';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Alert, ScrollView } from 'react-native';
 import Animated, { FadeInUp, FadeOutDown, LayoutAnimationConfig } from 'react-native-reanimated';
 import { Info } from '~/lib/icons/Info';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
@@ -16,7 +17,19 @@ import {
 import { Progress } from '~/components/ui/progress';
 import { Text } from '~/components/ui/text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip';
-import { spacing, borderRadius, borderWidth, units } from '~/lib/tokens';
+import { StudentLoanCard } from '~/components/ui/student-loan-card';
+import { 
+  spacing, 
+  borderRadius, 
+  borderWidth, 
+  units,
+  typography,
+  fontFamily,
+  fontWeight,
+  shadows,
+  colors,
+  breakpoints
+} from '~/lib/tokens';
 
 const router = useRouter();
 
@@ -29,209 +42,324 @@ export default function Screen() {
   function updateProgressValue() {
     setProgress(Math.floor(Math.random() * 100));
   }
+
+  // Student Loan handlers
+  const handleMakePayment = () => {
+    Alert.alert(
+      'Make Payment', 
+      'This would redirect to the payment portal in a real app.',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleManageAutoDebit = () => {
+    Alert.alert(
+      'Auto Debit Settings', 
+      'This would open auto debit management settings.',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleViewLoanDetails = () => {
+    Alert.alert(
+      'Loan Details', 
+      'This would show detailed loan information and payment history.',
+      [{ text: 'OK' }]
+    );
+  };
   
   return (
-    <View style={styles.container}>
-      <Card style={styles.card}>
-        <CardHeader style={styles.cardHeader}>
-          <Avatar style={styles.avatar} alt={''}>
-            <AvatarImage source={{ uri: GITHUB_AVATAR_URI }} />
-            <AvatarFallback>
-              <Text>RS</Text>
-            </AvatarFallback>
-          </Avatar>
-          <View style={styles.spacer} />
-          <CardTitle style={styles.cardTitle}>Rick Sanchez</CardTitle>
-          <View style={styles.titleRow}>
-            <CardDescription style={styles.profession}>Scientist</CardDescription>
-            <Tooltip delayDuration={150}>
-              <TooltipTrigger style={styles.tooltipTrigger}>
-                <Info size={14} strokeWidth={2.5} style={styles.infoIcon} />
-              </TooltipTrigger>
-              <TooltipContent style={styles.tooltipContent}>
-                <Text style={styles.tooltipText}>Freelance</Text>
-              </TooltipContent>
-            </Tooltip>
-          </View>
-        </CardHeader>
-        <CardContent>
-          <View style={styles.statsRow}>
-            <View style={styles.statItem}>
-              <Text style={styles.statLabel}>Dimension</Text>
-              <Text style={styles.statValue}>C-137</Text>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      {/* Section Title */}
+      <Text style={styles.sectionTitle}>
+        My Dashboard
+      </Text>
+
+      {/* Student Loan Cards */}
+      <View style={styles.loanSection}>
+        <Text style={styles.subsectionTitle}>
+          Student Loans
+        </Text>
+        
+        <StudentLoanCard
+          title="SU: Fall 2024 - Spring 2025"
+          amount="$349.51"
+          dueDate="Apr 27, 2025"
+          totalAmount="$17,419.03"
+          asOfDate="Mar 25, 2025"
+          currentAmountDue="$349.51"
+          paymentPending="$499.00"
+          dueDateDetail="April 27th, 2025"
+          isAutoDebitEnrolled={false}
+          onMakePayment={handleMakePayment}
+          onManageAutoDebit={handleManageAutoDebit}
+          onViewDetails={handleViewLoanDetails}
+        />
+
+        <StudentLoanCard
+          title="SU: Fall 2023 - Spring 2024"
+          amount="$425.00"
+          dueDate="May 15, 2025"
+          isAutoDebitEnrolled={true}
+          onMakePayment={handleMakePayment}
+          onManageAutoDebit={handleManageAutoDebit}
+          onViewDetails={handleViewLoanDetails}
+        />
+      </View>
+
+      {/* Profile Card Section */}
+      <View style={styles.profileSection}>
+        <Text style={styles.subsectionTitle}>
+          Profile Overview
+        </Text>
+        
+        <Card style={styles.profileCard}>
+          <CardHeader style={styles.cardHeader}>
+            <Avatar style={styles.avatar} alt={''}>
+              <AvatarImage source={{ uri: GITHUB_AVATAR_URI }} />
+              <AvatarFallback>
+                <Text style={styles.avatarText}>RS</Text>
+              </AvatarFallback>
+            </Avatar>
+            
+            <View style={styles.spacer} />
+            
+            <Text style={styles.profileName}>Rick Sanchez</Text>
+            
+            <View style={styles.titleRow}>
+              <Text style={styles.profession}>Scientist</Text>
+              <Tooltip delayDuration={150}>
+                <TooltipTrigger style={styles.tooltipTrigger}>
+                  <Info size={units[16]} strokeWidth={2.5} style={styles.infoIcon} />
+                </TooltipTrigger>
+                <TooltipContent style={styles.tooltipContent}>
+                  <Text style={styles.tooltipText}>Freelance</Text>
+                </TooltipContent>
+              </Tooltip>
             </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statLabel}>Age</Text>
-              <Text style={styles.statValue}>70</Text>
+          </CardHeader>
+          
+          <CardContent>
+            <View style={styles.statsRow}>
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>Dimension</Text>
+                <Text style={styles.statValue}>C-137</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>Age</Text>
+                <Text style={styles.statValue}>70</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>Species</Text>
+                <Text style={styles.statValue}>Human</Text>
+              </View>
             </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statLabel}>Species</Text>
-              <Text style={styles.statValue}>Human</Text>
+          </CardContent>
+          
+          <CardFooter style={styles.cardFooter}>
+            <View style={styles.progressRow}>
+              <Text style={styles.progressLabel}>Productivity:</Text>
+              <LayoutAnimationConfig skipEntering>
+                <Animated.View
+                  key={progress}
+                  entering={FadeInUp}
+                  exiting={FadeOutDown}
+                  style={styles.progressValue}
+                >
+                  <Text style={styles.progressText}>{progress}%</Text>
+                </Animated.View>
+              </LayoutAnimationConfig>
             </View>
-          </View>
-        </CardContent>
-        <CardFooter style={styles.cardFooter}>
-          <View style={styles.progressRow}>
-            <Text style={styles.progressLabel}>Productivity:</Text>
-            <LayoutAnimationConfig skipEntering>
-              <Animated.View
-                key={progress}
-                entering={FadeInUp}
-                exiting={FadeOutDown}
-                style={styles.progressValue}
-              >
-                <Text style={styles.progressText}>{progress}%</Text>
-              </Animated.View>
-            </LayoutAnimationConfig>
-          </View>
-          <Progress value={progress} style={styles.progress} />
-          <View style={styles.spacer} />
-          <Button
-            variant='outline'
-            style={styles.updateButton}
-            onPress={updateProgressValue}
-          >
-            <Text>Update</Text>
-          </Button>
-        </CardFooter>
-      </Card>
-      
-      {/* Design System Button */}
-      <Button 
-        variant="outline" 
-        className="mt-4"
-        onPress={() => router.push('/shadecn-demo')}
-      >
-        <Text>🎨 View shadcn/ui Components</Text>
-      </Button>
-      </View> 
+            <Progress value={progress} style={styles.progress} />
+            
+            <View style={styles.spacerLarge} />
+            
+            <Button
+              variant='outline'
+              size='default'
+              style={styles.updateButton}
+              onPress={updateProgressValue}
+            >
+              <Text>Update Progress</Text>
+            </Button>
+          </CardFooter>
+        </Card>
+      </View>
+
+      {/* Navigation Buttons */}
+      <View style={styles.navigationSection}>
+        <Button 
+          variant="outline" 
+          size="lg"
+          style={styles.designSystemButton}
+          onPress={() => router.push('/shadecn-demo')}
+        >
+          <Text>🎨 View Design System</Text>
+        </Button>
+        
+        {/* Token Usage Example */}
+        <View style={styles.tokenShowcase}>
+          <Text style={styles.showcaseTitle}>Design Tokens in Action</Text>
+          <Text style={styles.showcaseDescription}>
+            This interface uses {spacing.xl}px spacing, {borderRadius.s}px border radius, 
+            and the {fontFamily.rocGrotesk} font family from your design tokens.
+          </Text>
+        </View>
+      </View>
+    </ScrollView> 
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: spacing.l,                  // 16px from your tokens
-    padding: spacing.xl,             // 24px from your tokens
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background.primary,
   },
-  card: {
-    width: '100%',
-    maxWidth: 384,
-    padding: spacing.xl,             // 24px from your tokens
-    borderRadius: borderRadius.l,    // 16px from your tokens
+
+  contentContainer: {
+    paddingTop: spacing.l,               // 16px from your tokens
+    paddingBottom: spacing['2xl'],       // 32px from your tokens for bottom spacing
   },
+  
+  sectionTitle: {
+    textAlign: 'center',
+    marginBottom: spacing.xl,            // 24px from your tokens
+    color: colors.text.primary,
+    paddingHorizontal: spacing.l,        // 16px from your tokens
+  },
+
+  loanSection: {
+    marginBottom: spacing['2xl'],        // 32px from your tokens
+  },
+
+  profileSection: {
+    paddingHorizontal: spacing.l,        // 16px from your tokens
+    marginBottom: spacing.xl,            // 24px from your tokens
+  },
+
+  navigationSection: {
+    paddingHorizontal: spacing.l,        // 16px from your tokens
+    gap: spacing.l,                      // 16px from your tokens
+  },
+
+  subsectionTitle: {
+    marginBottom: spacing.l,             // 16px from your tokens
+    paddingHorizontal: spacing.l,        // 16px from your tokens
+    color: colors.text.primary,
+  },
+  
+  profileCard: {
+    padding: spacing.xl,                 // 24px from your tokens
+    ...shadows.md,                       // Medium shadow from your tokens
+  },
+  
   cardHeader: {
     alignItems: 'center',
+    gap: spacing.s,                      // 8px gap using your tokens
   },
+  
   avatar: {
-    width: units[96],                // 96px from your tokens
-    height: units[96],               // 96px from your tokens
+    width: units[80],                    // 80px from your tokens (smaller than before)
+    height: units[80],                   // 80px from your tokens
   },
+  
   spacer: {
-    height: spacing.m,               // 12px from your tokens
+    height: spacing.s,                   // 8px from your tokens
   },
-  cardTitle: {
-    paddingBottom: spacing.s,        // 8px from your tokens
-    textAlign: 'center',
+  
+  spacerLarge: {
+    height: spacing.m,                   // 12px from your tokens
   },
+  
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.xs,                     // 4px gap using your tokens
   },
-  profession: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  
   tooltipTrigger: {
-    paddingHorizontal: spacing.s,    // 8px from your tokens
-    paddingBottom: spacing.xs,       // 4px from your tokens (converted to 2)
+    padding: spacing.xs,                 // 4px from your tokens
   },
+  
   infoIcon: {
-    width: units[16],                // 16px from your tokens
-    height: units[16],               // 16px from your tokens
-    color: '#71717a',
+    color: colors.text.tertiary,         // Using your tertiary text color
   },
+  
   tooltipContent: {
-    paddingVertical: spacing.s,      // 8px from your tokens
-    paddingHorizontal: spacing.l,    // 16px from your tokens
+    paddingVertical: spacing.s,          // 8px from your tokens
+    paddingHorizontal: spacing.m,        // 12px from your tokens
   },
-  tooltipText: {
-    fontSize: 18,
-  },
+  
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    gap: spacing.m,                  // 12px from your tokens
+    gap: spacing.l,                      // 16px from your tokens
+    paddingVertical: spacing.m,          // 12px from your tokens
   },
+  
   statItem: {
     alignItems: 'center',
+    gap: spacing.xs,                     // 4px from your tokens
   },
+  
   statLabel: {
-    fontSize: 14,
-    color: '#71717a',
-    marginBottom: spacing.xs,        // 4px from your tokens
+    textAlign: 'center',
   },
-  statValue: {
-    fontSize: 20,
-    fontWeight: '600',
-  },
+  
   cardFooter: {
     flexDirection: 'column',
-    gap: spacing.m,                  // 12px from your tokens
+    gap: spacing.s,                      // 8px from your tokens
     paddingBottom: 0,
   },
+  
   progressRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.s,                      // 8px from your tokens
     overflow: 'hidden',
   },
+  
   progressLabel: {
-    fontSize: 14,
-    color: '#71717a',
-    marginRight: spacing.s,          // 8px from your tokens
+    flex: 1,
   },
+  
   progressValue: {
-    width: units[48],                // 48px from your tokens (wider for readability)
+    minWidth: units[40],                 // 40px from your tokens
     alignItems: 'center',
   },
+  
   progressText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#0ea5e9',
+    color: colors.semantic.info,         // Using your info color
   },
+  
   progress: {
-    height: spacing.s,               // 8px from your tokens
+    height: spacing.s,                   // 8px from your tokens
   },
+  
   updateButton: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    ...shadows.sm,                       // Using your shadow tokens
   },
-  tokenTest: {
-    marginTop: spacing.xl,           // 24px from your tokens
-    padding: spacing.l,              // 16px from your tokens
-    backgroundColor: '#f1f5f9',
-    borderRadius: borderRadius.s,    // 8px from your tokens
-    borderWidth: borderWidth.xs,     // 1px from your tokens
-    borderColor: '#e2e8f0',
-    alignItems: 'center',
-    maxWidth: '90%',
+  
+  designSystemButton: {
+    ...shadows.md,                       // Using your medium shadow tokens
   },
-  tokenTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1e293b',
-    marginBottom: spacing.s,         // 8px from your tokens
+  
+  tokenShowcase: {
+    padding: spacing.l,                  // 16px from your tokens
+    backgroundColor: colors.background.secondary, // Using your secondary background
+    borderRadius: borderRadius.s,        // 8px from your tokens
+    borderWidth: borderWidth.xs,         // 1px from your tokens
+    borderColor: colors.border.primary,  // Using your border color
+    gap: spacing.s,                      // 8px from your tokens
   },
-  tokenDescription: {
-    fontSize: 14,
-    color: '#64748b',
+  
+  showcaseTitle: {
     textAlign: 'center',
-    lineHeight: 20,
+    color: colors.text.primary,          // Using your primary text color
+  },
+  
+  showcaseDescription: {
+    textAlign: 'center',
+    lineHeight: typography.textS.lineHeight * 1.2, // Using your line height with slight adjustment
   },
 });
