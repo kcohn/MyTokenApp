@@ -1,23 +1,150 @@
 export const tokens = {
+  "color": {
+    "light": {
+      "text": {
+        "text": {
+          "header": {
+            "primary": "{Brand.Primary 1}",
+            "secondary": "{Tones.Gray 7}",
+            "tertiary": "{Tones.Gray 5}"
+          },
+          "body": {
+            "primary": "{Tones.Gray 7}",
+            "secondary": "{Tones.Gray 6}",
+            "disabled": "{Tones.Gray 4}",
+            "placeholder": "{Tones.Gray 4}",
+            "tertiary": "{Tones.Gray 5}"
+          },
+          "link": {
+            "primary": "{Brand.Primary 2 Thin}",
+            "secondary": "{Brand.Primary 1}"
+          },
+          "banner": "{Tones.White}",
+          "white": "{Tones.White}",
+          "accent": "{Brand.Primary 3}"
+        }
+      },
+      "button": {
+        "button": {
+          "primary": {
+            "pressed": "{Brand.Primary 2 Field - Active}"
+          },
+          "text": {
+            "primary": "{Tones.Surface}",
+            "disabled": "{Tones.Gray 3}"
+          },
+          "secondary": {
+            "pressed": "{Brand.Primary 1 - Active}"
+          },
+          "tertiary": "{Tints.Info}",
+          "disabled": "{Tones.Gray 2}",
+          "slider": {
+            "disabled": "{Tones.Gray 2}",
+            "text": {
+              "disabled": "{Tones.Gray 5}"
+            }
+          }
+        }
+      },
+      "surface": {
+        "surface": {
+          "component": {
+            "selected": "{Tints.Info selected}"
+          },
+          "primary": {
+            "1": "{Brand.Primary 1}",
+            "2": "{Brand.Primary 2 Field}",
+            "3": "{Brand.Primary 3}"
+          },
+          "disabled": "{Tones.Gray 1}",
+          "info": "{Tints.Warning}"
+        }
+      },
+      "stroke": {
+        "stroke": {
+          "component": {
+            "active": "{Brand.Primary 2 Thin}"
+          },
+          "divider": "{Tones.Gray 1}",
+          "disabled": "{Tones.Gray 2}",
+          "form": {
+            "field": "{Tones.Gray 3}"
+          },
+          "focus": "{Brand.Secondary 1}"
+        }
+      },
+      "controls": {
+        "toggle": {
+          "thumb": {
+            "disabled": "{Tones.Gray 1}"
+          },
+          "active": "{Brand.Primary 2 Field}",
+          "disabled": "{Tones.Gray 2}",
+          "off": "{Tones.Gray 4}"
+        },
+        "radio": {
+          "active": {
+            "thumb": "{Tones.Surface}"
+          },
+          "disabled": "{Tones.Gray 1}"
+        },
+        "focus": "{Transparencies.Focus}"
+      },
+      "icon": {
+        "icon": {
+          "primary": "{Brand.Primary 3}",
+          "secondary": "{Brand.Primary 1}",
+          "tertiary": "{Tones.Gray 7}",
+          "disabled": "{Tones.Gray 3}",
+          "link": {
+            "off": "{Tones.Gray 5}"
+          }
+        }
+      },
+      "brand": {
+        "secondary": {
+          "1": "{Brand.Secondary 1}",
+          "2": "{Brand.Secondary 2}",
+          "3": "{Brand.Secondary 3}",
+          "4": "{Brand.Secondary 4}"
+        },
+        "primary": {
+          "2": "{Brand.Primary 2 Field}",
+          "3": "{Brand.Primary 3}",
+          "4": "{Brand.Primary 1}"
+        },
+        "contrast": "{Tones.White}"
+      },
+      "dark": {
+        "dark": {
+          "or": {
+            "light": {
+              "mode": "\"{Sallie dark or light mode}\""
+            }
+          }
+        }
+      }
+    }
+  },
   "primitive": {
     "type": {
       "mode": {
         "1": {
           "weight": {
             "bold": {
-              "italic": "Bold Italic"
+              "italic": "\"Bold Italic\""
             },
             "semibold": {
-              "italic": "Semibold Italic"
+              "italic": "\"Semibold Italic\""
             },
             "medium": {
-              "italic": "Medium Italic"
+              "italic": "\"Medium Italic\""
             },
-            "regular": "Regular",
+            "regular": "\"Regular\"",
             "light": {
-              "italic": "Light Italic"
+              "italic": "\"Light Italic\""
             },
-            "italic": "Italic"
+            "italic": "\"Italic\""
           },
           "family": {
             "open": {
@@ -30,11 +157,45 @@ export const tokens = {
               "sans": "\"Albert Sans\""
             }
           },
+          "size": {
+            "xs": "10px",
+            "10xl": "72px",
+            "6xl": "40px",
+            "8xl": "56px",
+            "l": "16px",
+            "s": "12px",
+            "7xl": "48px",
+            "5xl": "32px",
+            "3xl": "24px",
+            "2xl": "20px",
+            "xl": "18px",
+            "m": "14px",
+            "9xl": "64px",
+            "4xl": "28px"
+          },
           "letter": {
             "spacing": {
               "s": "-0.5px",
               "xs": "-1px",
               "none": "0px"
+            }
+          },
+          "line": {
+            "height": {
+              "9xl": "72px",
+              "8xl": "64px",
+              "7xl": "56px",
+              "6xl": "48px",
+              "5xl": "40px",
+              "l": "24px",
+              "3xl": "32px",
+              "xl": "26px",
+              "10xl": "80px",
+              "2xl": "28px",
+              "s": "16px",
+              "m": "20px",
+              "4xl": "36px",
+              "xs": "14px"
             }
           }
         }

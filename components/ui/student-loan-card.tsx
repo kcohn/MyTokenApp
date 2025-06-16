@@ -1,4 +1,4 @@
-// components/ui/student-loan-card.tsx
+// components/ui/student-loan-card.tsx - Updated to use design token colors
 import * as React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Text } from './text';
@@ -13,7 +13,7 @@ import {
   fontFamily,
   fontWeight,
   shadows,
-  colors
+  colors // Now includes your Figma color tokens!
 } from '~/lib/tokens';
 
 interface StudentLoanCardProps {
@@ -184,11 +184,11 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    backgroundColor: '#f8f9ff',          // Light purple background
+    backgroundColor: colors.surface.component,  // Using your surface component token!
     paddingHorizontal: spacing.l,        // 16px from your tokens
     paddingVertical: spacing.m,          // 12px from your tokens
     borderBottomWidth: borderWidth.xs,   // 1px from your tokens
-    borderBottomColor: '#e8e9ff',
+    borderBottomColor: colors.border.primary,  // Using your border token!
   },
 
   headerContent: {
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
 
   chevron: {
     fontSize: units[20],                 // 20px from your tokens
-    color: colors.text.tertiary,         // Using your tertiary text color
+    color: colors.text.tertiary,         // Using your tertiary text color token!
     fontWeight: fontWeight.medium,       // Using your medium weight token
   },
 
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     fontSize: units[32],                 // 32px from your tokens
     fontFamily: fontFamily.rocGrotesk,   // Using your brand font
     fontWeight: fontWeight.bold,         // Using your bold weight token
-    color: colors.text.primary,          // Using your primary text color
+    color: colors.text.primary,          // Using your primary text color token!
     lineHeight: units[40],               // 40px line height from your tokens
   },
 
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     fontSize: units[28],                 // 28px from your tokens
     fontFamily: fontFamily.rocGrotesk,   // Using your brand font
     fontWeight: fontWeight.bold,         // Using your bold weight token
-    color: colors.text.primary,          // Using your primary text color
+    color: colors.text.primary,          // Using your primary text color token!
     lineHeight: units[36],               // 36px line height from your tokens
   },
 
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     width: units[32],                    // 32px from your tokens
     height: units[32],                   // 32px from your tokens
     borderRadius: borderRadius.circle,   // 50px from your tokens (circle)
-    backgroundColor: '#2563eb',          // Blue background
+    backgroundColor: colors.button.tertiary, // Using your button tertiary color token!
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   },
 
   paymentButton: {
-    backgroundColor: '#2563eb',          // Blue color matching the design
+    backgroundColor: colors.button.primary, // NOW USING YOUR DESIGN TOKEN! 🎉
     borderRadius: borderRadius.l,        // 16px from your tokens (larger radius for buttons)
     paddingVertical: spacing.l,          // 16px from your tokens
     marginTop: spacing.s,                // 8px from your tokens
