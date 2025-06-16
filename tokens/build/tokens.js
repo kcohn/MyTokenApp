@@ -4,44 +4,44 @@ export const tokens = {
       "text": {
         "text": {
           "header": {
-            "primary": "{Brand.Primary 1}",
-            "secondary": "{Tones.Gray 7}",
-            "tertiary": "{Tones.Gray 5}"
+            "primary": "#000000",
+            "secondary": "#000000",
+            "tertiary": "#000000"
           },
           "body": {
-            "primary": "{Tones.Gray 7}",
-            "secondary": "{Tones.Gray 6}",
-            "disabled": "{Tones.Gray 4}",
-            "placeholder": "{Tones.Gray 4}",
-            "tertiary": "{Tones.Gray 5}"
+            "primary": "#000000",
+            "secondary": "#000000",
+            "disabled": "#000000",
+            "placeholder": "#000000",
+            "tertiary": "#000000"
           },
           "link": {
-            "primary": "{Brand.Primary 2 Thin}",
-            "secondary": "{Brand.Primary 1}"
+            "primary": "#000000",
+            "secondary": "#000000"
           },
-          "banner": "{Tones.White}",
-          "white": "{Tones.White}",
-          "accent": "{Brand.Primary 3}"
+          "banner": "#000000",
+          "white": "#000000",
+          "accent": "#000000"
         }
       },
       "button": {
         "button": {
           "primary": {
-            "pressed": "{Brand.Primary 2 Field - Active}"
+            "pressed": "#000000"
           },
           "text": {
-            "primary": "{Tones.Surface}",
-            "disabled": "{Tones.Gray 3}"
+            "primary": "#000000",
+            "disabled": "#000000"
           },
           "secondary": {
-            "pressed": "{Brand.Primary 1 - Active}"
+            "pressed": "#000000"
           },
-          "tertiary": "{Tints.Info}",
-          "disabled": "{Tones.Gray 2}",
+          "tertiary": "#000000",
+          "disabled": "#000000",
           "slider": {
-            "disabled": "{Tones.Gray 2}",
+            "disabled": "#000000",
             "text": {
-              "disabled": "{Tones.Gray 5}"
+              "disabled": "#000000"
             }
           }
         }
@@ -49,77 +49,77 @@ export const tokens = {
       "surface": {
         "surface": {
           "component": {
-            "selected": "{Tints.Info selected}"
+            "selected": "#000000"
           },
           "primary": {
-            "1": "{Brand.Primary 1}",
-            "2": "{Brand.Primary 2 Field}",
-            "3": "{Brand.Primary 3}"
+            "1": "#000000",
+            "2": "#000000",
+            "3": "#000000"
           },
-          "disabled": "{Tones.Gray 1}",
-          "info": "{Tints.Warning}"
+          "disabled": "#000000",
+          "info": "#000000"
         }
       },
       "stroke": {
         "stroke": {
           "component": {
-            "active": "{Brand.Primary 2 Thin}"
+            "active": "#000000"
           },
-          "divider": "{Tones.Gray 1}",
-          "disabled": "{Tones.Gray 2}",
+          "divider": "#000000",
+          "disabled": "#000000",
           "form": {
-            "field": "{Tones.Gray 3}"
+            "field": "#000000"
           },
-          "focus": "{Brand.Secondary 1}"
+          "focus": "#000000"
         }
       },
       "controls": {
         "toggle": {
           "thumb": {
-            "disabled": "{Tones.Gray 1}"
+            "disabled": "#000000"
           },
-          "active": "{Brand.Primary 2 Field}",
-          "disabled": "{Tones.Gray 2}",
-          "off": "{Tones.Gray 4}"
+          "active": "#000000",
+          "disabled": "#000000",
+          "off": "#000000"
         },
         "radio": {
           "active": {
-            "thumb": "{Tones.Surface}"
+            "thumb": "#000000"
           },
-          "disabled": "{Tones.Gray 1}"
+          "disabled": "#000000"
         },
-        "focus": "{Transparencies.Focus}"
+        "focus": "#000000"
       },
       "icon": {
         "icon": {
-          "primary": "{Brand.Primary 3}",
-          "secondary": "{Brand.Primary 1}",
-          "tertiary": "{Tones.Gray 7}",
-          "disabled": "{Tones.Gray 3}",
+          "primary": "#000000",
+          "secondary": "#000000",
+          "tertiary": "#000000",
+          "disabled": "#000000",
           "link": {
-            "off": "{Tones.Gray 5}"
+            "off": "#000000"
           }
         }
       },
       "brand": {
         "secondary": {
-          "1": "{Brand.Secondary 1}",
-          "2": "{Brand.Secondary 2}",
-          "3": "{Brand.Secondary 3}",
-          "4": "{Brand.Secondary 4}"
+          "1": "#000000",
+          "2": "#000000",
+          "3": "#000000",
+          "4": "#000000"
         },
         "primary": {
-          "2": "{Brand.Primary 2 Field}",
-          "3": "{Brand.Primary 3}",
-          "4": "{Brand.Primary 1}"
+          "2": "#000000",
+          "3": "#000000",
+          "4": "#000000"
         },
-        "contrast": "{Tones.White}"
+        "contrast": "#000000"
       },
       "dark": {
         "dark": {
           "or": {
             "light": {
-              "mode": "\"{Sallie dark or light mode}\""
+              "mode": "\"Light\""
             }
           }
         }
@@ -159,19 +159,19 @@ export const tokens = {
           },
           "size": {
             "xs": "10px",
-            "10xl": "72px",
-            "6xl": "40px",
+            "10xl": "2px",
+            "6xl": "4px",
             "8xl": "56px",
             "l": "16px",
-            "s": "12px",
-            "7xl": "48px",
-            "5xl": "32px",
-            "3xl": "24px",
-            "2xl": "20px",
-            "xl": "18px",
-            "m": "14px",
-            "9xl": "64px",
-            "4xl": "28px"
+            "s": "2px",
+            "7xl": "4px",
+            "5xl": "2px",
+            "3xl": "2px",
+            "2xl": "2px",
+            "xl": "8px",
+            "m": "4px",
+            "9xl": "4px",
+            "4xl": "2px"
           },
           "letter": {
             "spacing": {
@@ -182,20 +182,20 @@ export const tokens = {
           },
           "line": {
             "height": {
-              "9xl": "72px",
-              "8xl": "64px",
+              "9xl": "2px",
+              "8xl": "4px",
               "7xl": "56px",
-              "6xl": "48px",
-              "5xl": "40px",
-              "l": "24px",
-              "3xl": "32px",
-              "xl": "26px",
-              "10xl": "80px",
-              "2xl": "28px",
+              "6xl": "4px",
+              "5xl": "4px",
+              "l": "2px",
+              "3xl": "2px",
+              "xl": "2px",
+              "10xl": "8px",
+              "2xl": "2px",
               "s": "16px",
-              "m": "20px",
+              "m": "2px",
               "4xl": "36px",
-              "xs": "14px"
+              "xs": "4px"
             }
           }
         }

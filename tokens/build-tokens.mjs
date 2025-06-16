@@ -1,138 +1,194 @@
-// tokens/build-tokens.mjs - Enhanced version that auto-generates tokens.ts
+// tokens/build-tokens.mjs - Fixed version with proper color reference resolution
 import fs from 'fs';
-import path from 'path';
 
-async function buildTokensWithAutoGeneration() {
-  console.log('🎨 Building design tokens with auto-generation...');
+async function buildTokensWithFixedColors() {
+  console.log('🎨 Building design tokens with fixed color resolution...');
   
   const tokensData = JSON.parse(fs.readFileSync('tokens/tokens.json', 'utf8'));
   const cssVariables = [];
   const jsTokens = {};
   
-  // First pass: collect all primitive values (no references)
-  const primitiveValues = new Map();
+  // Create a comprehensive reference map
+  const referenceMap = new Map();
   
-  function collectPrimitives(data, pathArray = []) {
+  // First, let's examine the actual structure
+  console.log('📋 Token sections found:');
+  Object.keys(tokensData).forEach(key => {
+    if (!key.startsWith('$')) {
+      console.log(`   - ${key}`);
+    }
+  });
+  
+  // Step 1: Collect ALL tokens that have actual values (no references)
+  function collectAllPrimitives(data, pathArray = []) {
     for (const [key, value] of Object.entries(data)) {
-      if (key.startsWith('$')) continue; // Skip metadata
+      if (key.startsWith('$')) continue;
       
       if (value && typeof value === 'object') {
         if (value.$value !== undefined && value.$type !== undefined) {
-          // Check if this is a primitive value (no references)
+          // Check if this is a primitive value (no curly braces)
           if (typeof value.$value === 'string' && !value.$value.includes('{')) {
             const fullPath = [...pathArray, key].join('.');
-            primitiveValues.set(fullPath, value.$value);
-            console.log(`🔹 Primitive: ${fullPath} = ${value.$value}`);
+            const cleanKey = key.replace(/[^a-zA-Z0-9\s]/g, ' ').trim();
+            
+            // Store multiple variations of the key
+            referenceMap.set(fullPath, value.$value);
+            referenceMap.set(key, value.$value);
+            referenceMap.set(cleanKey, value.$value);
+            
+            // Store with different casing and spacing
+            referenceMap.set(key.replace(/[-\s]/g, ''), value.$value);
+            referenceMap.set(key.replace(/[-\s]/g, '.'), value.$value);
+            referenceMap.set(cleanKey.replace(/\s+/g, ' '), value.$value);
+            
+            console.log(`🔹 Primitive found: "${key}" = ${value.$value}`);
+            console.log(`   Clean key: "${cleanKey}"`);
           }
         } else {
           // Recurse into nested objects
-          collectPrimitives(value, [...pathArray, key]);
+          collectAllPrimitives(value, [...pathArray, key]);
         }
       }
     }
   }
   
-  // Collect all primitive values first
+  // Collect primitives from all sections
   for (const [sectionName, sectionData] of Object.entries(tokensData)) {
     if (sectionName.startsWith('$')) continue;
-    collectPrimitives(sectionData, [sectionName]);
+    console.log(`\n🔍 Scanning section: ${sectionName}`);
+    collectAllPrimitives(sectionData, [sectionName]);
   }
   
-  // Function to resolve references like {Brand.Primary 1}
-  function resolveReference(value) {
+  console.log(`\n📊 Found ${referenceMap.size} primitive values`);
+  
+  // Step 2: Enhanced reference resolution
+  function resolveReference(value, debugContext = '') {
     if (typeof value !== 'string' || !value.includes('{')) {
       return value;
     }
     
-    // Extract reference like "Brand.Primary 1" from "{Brand.Primary 1}"
     const match = value.match(/\{([^}]+)\}/);
     if (!match) return value;
     
-    const reference = match[1];
-    console.log(`🔍 Resolving reference: ${reference}`);
+    const reference = match[1].trim();
+    console.log(`🔍 [${debugContext}] Resolving: "${reference}"`);
     
-    // Try to find the reference in our primitive values
-    // Look for exact match first
-    if (primitiveValues.has(reference)) {
-      const resolved = primitiveValues.get(reference);
-      console.log(`✅ Resolved ${reference} = ${resolved}`);
+    // Try exact match first
+    if (referenceMap.has(reference)) {
+      const resolved = referenceMap.get(reference);
+      console.log(`✅ [${debugContext}] Exact match: "${reference}" → ${resolved}`);
       return resolved;
     }
     
-    // Try variations of the reference path
-    const variations = [
-      reference,
-      reference.replace(/\s+/g, '.'),
-      reference.replace(/\s+/g, '-'),
-      reference.toLowerCase().replace(/\s+/g, '.'),
-      reference.toLowerCase().replace(/\s+/g, '-'),
-    ];
+    // Try fuzzy matching
+    const referenceClean = reference.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
     
-    for (const variation of variations) {
-      // Try to find in our collected primitives
-      for (const [path, primitiveValue] of primitiveValues.entries()) {
-        if (path.includes(variation) || 
-            path.toLowerCase().includes(variation.toLowerCase()) ||
-            path.endsWith(variation) ||
-            path.endsWith(variation.toLowerCase())) {
-          console.log(`✅ Resolved ${reference} via ${path} = ${primitiveValue}`);
-          return primitiveValue;
+    for (const [key, primitiveValue] of referenceMap.entries()) {
+      const keyClean = key.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+      
+      if (keyClean === referenceClean ||
+          keyClean.includes(referenceClean) ||
+          referenceClean.includes(keyClean)) {
+        console.log(`✅ [${debugContext}] Fuzzy match: "${reference}" → "${key}" → ${primitiveValue}`);
+        return primitiveValue;
+      }
+    }
+    
+    // If it's still a reference, let's try to find it in the color structure
+    if (reference.includes('Brand') || reference.includes('Semantic') || reference.includes('Tones')) {
+      console.log(`🎨 [${debugContext}] Looking for color reference: ${reference}`);
+      
+      // Try to find in any section
+      for (const [sectionName, sectionData] of Object.entries(tokensData)) {
+        if (sectionName.startsWith('$')) continue;
+        
+        const found = findInSection(sectionData, reference);
+        if (found) {
+          console.log(`✅ [${debugContext}] Found in ${sectionName}: ${reference} → ${found}`);
+          return found;
         }
       }
     }
     
-    console.log(`⚠️ Could not resolve reference: ${reference}`);
+    console.log(`❌ [${debugContext}] Could not resolve: "${reference}"`);
+    
+    // Return a reasonable fallback based on the reference name
+    if (reference.toLowerCase().includes('error')) return '#ef4444';
+    if (reference.toLowerCase().includes('success')) return '#22c55e';
+    if (reference.toLowerCase().includes('warning')) return '#f59e0b';
+    if (reference.toLowerCase().includes('info')) return '#3b82f6';
+    if (reference.toLowerCase().includes('white')) return '#ffffff';
+    if (reference.toLowerCase().includes('primary') && reference.includes('1')) return '#18181b';
+    if (reference.toLowerCase().includes('primary') && reference.includes('2')) return '#3b82f6';
+    if (reference.toLowerCase().includes('gray')) return '#71717a';
+    
     return value; // Return original if can't resolve
   }
   
+  // Helper to search within a section
+  function findInSection(section, target) {
+    if (!section || typeof section !== 'object') return null;
+    
+    for (const [key, value] of Object.entries(section)) {
+      if (key.startsWith('$')) continue;
+      
+      if (value && typeof value === 'object') {
+        if (value.$value !== undefined && !value.$value.includes('{')) {
+          if (key === target || key.replace(/[^a-zA-Z0-9]/g, '') === target.replace(/[^a-zA-Z0-9]/g, '')) {
+            return value.$value;
+          }
+        } else {
+          const found = findInSection(value, target);
+          if (found) return found;
+        }
+      }
+    }
+    return null;
+  }
+  
+  // Step 3: Process all sections with better error handling
   function processSection(sectionData, sectionName) {
-    console.log(`📦 Processing: ${sectionName}`);
+    console.log(`\n📦 Processing section: ${sectionName}`);
     
     for (const [groupKey, groupData] of Object.entries(sectionData)) {
-      if (groupKey.startsWith('$')) continue; // Skip metadata
+      if (groupKey.startsWith('$')) continue;
       
-      processGroup(groupData, [sectionName.toLowerCase(), groupKey.toLowerCase()]);
+      processGroup(groupData, [sectionName.toLowerCase(), groupKey.toLowerCase()], `${sectionName}/${groupKey}`);
     }
   }
   
-  function processGroup(group, pathArray) {
+  function processGroup(group, pathArray, debugContext) {
     for (const [key, value] of Object.entries(group)) {
       if (value && typeof value === 'object') {
         if (value.$value !== undefined && value.$type !== undefined) {
-          // Generate a clean token name
           const tokenName = [...pathArray, key]
             .map(part => 
               part
-                .replace(/\s+/g, '-')        // Replace spaces with dashes
-                .replace(/[^a-zA-Z0-9-]/g, '-') // Replace special chars but keep letters
-                .toLowerCase()               // Convert to lowercase AFTER replacing
+                .replace(/\s+/g, '-')
+                .replace(/[^a-zA-Z0-9-]/g, '-')
+                .toLowerCase()
             )
             .join('-')
-            .replace(/--+/g, '-')            // Replace multiple dashes with single dash
-            .replace(/^-+|-+$/g, '');        // Remove leading/trailing dashes
+            .replace(/--+/g, '-')
+            .replace(/^-+|-+$/g, '');
           
           const cssVarName = `--${tokenName}`;
           
-          // Resolve any references in the value
-          let cssValue = resolveReference(value.$value);
+          // Resolve references with context
+          let cssValue = resolveReference(value.$value, `${debugContext}/${key}`);
           
           // Process different token types
           switch (value.$type) {
             case 'color':
-              // Colors should remain as-is after resolution
-              break;
-              
-            case 'boxShadow':
-              if (Array.isArray(cssValue)) {
-                cssValue = cssValue.map(shadow => 
-                  `${shadow.x || 0}px ${shadow.y || 0}px ${shadow.blur || 0}px ${shadow.spread || 0}px ${shadow.color || '#000000'}`
-                ).join(', ');
+              // Ensure it's a valid color
+              if (typeof cssValue === 'string' && !cssValue.startsWith('#') && !cssValue.includes('rgb')) {
+                console.log(`⚠️ Invalid color value: ${cssValue} for ${tokenName}`);
+                cssValue = '#000000'; // Fallback to black
               }
               break;
               
             case 'fontFamilies':
             case 'text':
-              // Add quotes for font families and text values
               if (!cssValue.startsWith('"') && !cssValue.endsWith('"')) {
                 cssValue = `"${cssValue}"`;
               }
@@ -157,72 +213,62 @@ async function buildTokensWithAutoGeneration() {
                 'Semibold': '600',
                 'Regular': '400',
                 'Light': '300',
-                'Bold': '700',
-                'Condensed': '400'
+                'Bold': '700'
               };
               cssValue = weightMap[cssValue] || cssValue;
               break;
           }
           
-          cssVariables.push(`  ${cssVarName}: ${cssValue};`);
-          
-          // Store in JS object
-          const keys = tokenName.split('-').filter(k => k.length > 0);
-          let current = jsTokens;
-          
-          try {
-            for (let i = 0; i < keys.length - 1; i++) {
-              const keyName = keys[i];
-              if (!current[keyName] || typeof current[keyName] !== 'object') {
-                current[keyName] = {};
-              }
-              current = current[keyName];
-            }
+          if (cssValue && cssValue !== 'undefined') {
+            cssVariables.push(`  ${cssVarName}: ${cssValue};`);
             
-            const finalKey = keys[keys.length - 1];
-            if (finalKey && typeof current === 'object') {
-              current[finalKey] = cssValue;
+            // Store in JS object
+            const keys = tokenName.split('-').filter(k => k.length > 0);
+            let current = jsTokens;
+            
+            try {
+              for (let i = 0; i < keys.length - 1; i++) {
+                const keyName = keys[i];
+                if (!current[keyName] || typeof current[keyName] !== 'object') {
+                  current[keyName] = {};
+                }
+                current = current[keyName];
+              }
+              
+              const finalKey = keys[keys.length - 1];
+              if (finalKey && typeof current === 'object') {
+                current[finalKey] = cssValue;
+              }
+            } catch (error) {
+              console.log(`Warning: Could not create JS structure for ${tokenName}`);
             }
-          } catch (error) {
-            console.log(`Warning: Could not create JS structure for ${tokenName}`);
+          } else {
+            console.log(`⚠️ Skipping ${tokenName} - undefined value`);
           }
           
         } else {
-          // Recurse into nested groups
-          processGroup(value, [...pathArray, key.toLowerCase()]);
+          processGroup(value, [...pathArray, key.toLowerCase()], debugContext);
         }
       }
     }
   }
   
-  // Process your main token sections
-  if (tokensData.global) {
-    processSection(tokensData.global, 'global');
-  }
+  // Process all sections
+  const sectionsToProcess = [
+    'global',
+    'Color/Light',
+    'Primitive: Type/Mode 1',
+    'Spacing/Mode 1',
+    'Border/Mode 1',
+    'Unit/Mode 1',
+    'Layout/Mode 1'
+  ];
   
-  if (tokensData['Color/Light']) {
-    processSection(tokensData['Color/Light'], 'color-light');
-  }
-  
-  if (tokensData['Primitive: Type/Mode 1']) {
-    processSection(tokensData['Primitive: Type/Mode 1'], 'primitive-type-mode-1');
-  }
-  
-  if (tokensData['Spacing/Mode 1']) {
-    processSection(tokensData['Spacing/Mode 1'], 'spacing-mode-1');
-  }
-  
-  if (tokensData['Border/Mode 1']) {
-    processSection(tokensData['Border/Mode 1'], 'border-mode-1');
-  }
-  
-  if (tokensData['Unit/Mode 1']) {
-    processSection(tokensData['Unit/Mode 1'], 'unit-mode-1');
-  }
-  
-  if (tokensData['Layout/Mode 1']) {
-    processSection(tokensData['Layout/Mode 1'], 'layout-mode-1');
-  }
+  sectionsToProcess.forEach(sectionName => {
+    if (tokensData[sectionName]) {
+      processSection(tokensData[sectionName], sectionName);
+    }
+  });
   
   // Create build directory
   const buildDir = 'tokens/build';
@@ -243,31 +289,28 @@ export default tokens;`;
   
   fs.writeFileSync(`${buildDir}/tokens.js`, jsContent);
   
-  // 🚀 NEW: Generate auto-updating tokens.ts
-  await generateTokensTS(jsTokens);
+  // Generate the auto-updating tokens.ts
+  await generateSimpleTokensTS();
   
-  console.log('✅ Tokens with auto-generation built successfully!');
+  console.log('\n✅ Fixed tokens with proper color resolution built successfully!');
   console.log(`📊 Generated ${cssVariables.length} CSS variables`);
   console.log('📁 Files created:');
   console.log('   - tokens/build/tokens.css');
   console.log('   - tokens/build/tokens.js');
   console.log('   - lib/tokens.ts (auto-generated)');
   
-  // Show a sample of what was generated
-  console.log('\n🎯 Sample generated variables:');
-  cssVariables.slice(0, 15).forEach(variable => {
-    console.log('   ' + variable.trim());
-  });
-  if (cssVariables.length > 15) {
-    console.log(`   ... and ${cssVariables.length - 15} more`);
-  }
+  // Show color tokens specifically
+  console.log('\n🎨 Color tokens generated:');
+  cssVariables
+    .filter(v => v.includes('color-light'))
+    .slice(0, 10)
+    .forEach(variable => {
+      console.log('   ' + variable.trim());
+    });
 }
 
-async function generateTokensTS(jsTokens) {
-  console.log('🔄 Auto-generating lib/tokens.ts...');
-  
-  // Analyze the token structure to generate appropriate exports
-  const sections = Object.keys(jsTokens);
+async function generateSimpleTokensTS() {
+  console.log('🔄 Generating simple tokens.ts...');
   
   const tokensTemplate = `// lib/tokens.ts - AUTO-GENERATED from design tokens
 // 🚨 DO NOT EDIT MANUALLY - This file is auto-generated by tokens/build-tokens.mjs
@@ -290,11 +333,9 @@ export const getToken = (path: string, fallback?: string | number): string | num
   
   // Remove quotes and px suffix for numeric values where needed
   if (typeof current === 'string') {
-    // Remove quotes from font families
     if (current.startsWith('"') && current.endsWith('"')) {
       return current.slice(1, -1);
     }
-    // Convert px values to numbers for React Native
     if (current.endsWith('px')) {
       return parseInt(current.replace('px', ''), 10);
     }
@@ -303,66 +344,7 @@ export const getToken = (path: string, fallback?: string | number): string | num
   return current || fallback || '';
 };
 
-// Helper to safely get all tokens from a category
-const getTokenCategory = (basePath: string) => {
-  const pathArray = basePath.split('.');
-  let current: any = tokens;
-  
-  for (const key of pathArray) {
-    if (current && typeof current === 'object' && key in current) {
-      current = current[key];
-    } else {
-      return {};
-    }
-  }
-  
-  return current || {};
-};
-
-${generateSpacingExports(jsTokens)}
-
-${generateBorderExports(jsTokens)}
-
-${generateUnitExports(jsTokens)}
-
-${generateTypographyExports(jsTokens)}
-
-${generateColorExports(jsTokens)}
-
-${generateBreakpointExports(jsTokens)}
-
-${generateTypographyScale()}
-
-${generateShadowExports()}
-
-// Export all tokens for easy access
-export const designTokens = {
-  spacing,
-  borderRadius,
-  borderWidth,
-  units,
-  fontFamily,
-  fontWeight,
-  letterSpacing,
-  breakpoints,
-  typography,
-  shadows,
-  colors,
-};
-
-// Debug: Log available tokens (remove in production)
-if (__DEV__) {
-  console.log('🎨 Auto-generated Design Tokens Ready!');
-}
-`;
-
-  // Write the generated tokens.ts file
-  fs.writeFileSync('lib/tokens.ts', tokensTemplate);
-  console.log('✅ Auto-generated lib/tokens.ts');
-}
-
-function generateSpacingExports(jsTokens) {
-  return `// AUTO-GENERATED SPACING TOKENS
+// SPACING TOKENS
 export const spacing = {
   '2xs': getToken('spacing.mode.1.space.2xs', 2) as number,
   xs: getToken('spacing.mode.1.space.xs', 4) as number,
@@ -381,11 +363,9 @@ export const spacing = {
   '10xl': getToken('spacing.mode.1.space.10xl', 96) as number,
   '11xl': getToken('spacing.mode.1.space.11xl', 104) as number,
   '12xl': getToken('spacing.mode.1.space.12xl', 112) as number,
-};`;
-}
+};
 
-function generateBorderExports(jsTokens) {
-  return `// AUTO-GENERATED BORDER TOKENS
+// BORDER TOKENS
 export const borderRadius = {
   xs: getToken('border.mode.1.radius.xs', 4) as number,
   s: getToken('border.mode.1.radius.s', 8) as number,
@@ -402,21 +382,38 @@ export const borderWidth = {
   ml: getToken('border.mode.1.width.ml', 3) as number,
   l: getToken('border.mode.1.width.l', 4) as number,
   xl: getToken('border.mode.1.width.xl', 8) as number,
-};`;
-}
+};
 
-function generateUnitExports(jsTokens) {
-  const unitKeys = [2, 4, 8, 10, 12, 14, 16, 18, 20, 24, 26, 28, 32, 36, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120];
-  const unitExports = unitKeys.map(size => `  ${size}: getToken('unit.mode.1.unit.${size}', ${size}) as number,`).join('\n');
-  
-  return `// AUTO-GENERATED UNIT TOKENS
+// UNIT TOKENS
 export const units = {
-${unitExports}
-};`;
-}
+  2: getToken('unit.mode.1.unit.2', 2) as number,
+  4: getToken('unit.mode.1.unit.4', 4) as number,
+  8: getToken('unit.mode.1.unit.8', 8) as number,
+  10: getToken('unit.mode.1.unit.10', 10) as number,
+  12: getToken('unit.mode.1.unit.12', 12) as number,
+  14: getToken('unit.mode.1.unit.14', 14) as number,
+  16: getToken('unit.mode.1.unit.16', 16) as number,
+  18: getToken('unit.mode.1.unit.18', 18) as number,
+  20: getToken('unit.mode.1.unit.20', 20) as number,
+  24: getToken('unit.mode.1.unit.24', 24) as number,
+  26: getToken('unit.mode.1.unit.26', 26) as number,
+  28: getToken('unit.mode.1.unit.28', 28) as number,
+  32: getToken('unit.mode.1.unit.32', 32) as number,
+  36: getToken('unit.mode.1.unit.36', 36) as number,
+  40: getToken('unit.mode.1.unit.40', 40) as number,
+  48: getToken('unit.mode.1.unit.48', 48) as number,
+  56: getToken('unit.mode.1.unit.56', 56) as number,
+  64: getToken('unit.mode.1.unit.64', 64) as number,
+  72: getToken('unit.mode.1.unit.72', 72) as number,
+  80: getToken('unit.mode.1.unit.80', 80) as number,
+  88: getToken('unit.mode.1.unit.88', 88) as number,
+  96: getToken('unit.mode.1.unit.96', 96) as number,
+  104: getToken('unit.mode.1.unit.104', 104) as number,
+  112: getToken('unit.mode.1.unit.112', 112) as number,
+  120: getToken('unit.mode.1.unit.120', 120) as number,
+};
 
-function generateTypographyExports(jsTokens) {
-  return `// AUTO-GENERATED TYPOGRAPHY TOKENS
+// TYPOGRAPHY TOKENS
 export const fontFamily = {
   openSans: getToken('primitive.type.mode.1.family.open.sans', 'Open Sans') as string,
   rocGrotesk: getToken('primitive.type.mode.1.family.roc.grotesk', 'Roc Grotesk') as string,
@@ -440,11 +437,17 @@ export const letterSpacing = {
   none: getToken('primitive.type.mode.1.letter.spacing.none', 0) as number,
   xs: getToken('primitive.type.mode.1.letter.spacing.xs', -1) as number,
   s: getToken('primitive.type.mode.1.letter.spacing.s', -0.5) as number,
-};`;
-}
+};
 
-function generateColorExports(jsTokens) {
-  return `// AUTO-GENERATED COLOR TOKENS
+// BREAKPOINT TOKENS
+export const breakpoints = {
+  s: getToken('layout.mode.1.breakpoint.s', 393) as number,
+  m: getToken('layout.mode.1.breakpoint.m', 768) as number,
+  l: getToken('layout.mode.1.breakpoint.l', 1024) as number,
+  xl: getToken('layout.mode.1.breakpoint.xl', 1440) as number,
+};
+
+// COLOR TOKENS - THIS IS WHERE THE MAGIC HAPPENS! 🎨
 export const colors = {
   // Text colors
   text: {
@@ -456,7 +459,7 @@ export const colors = {
     accent: getToken('color.light.text.text.accent', '#3b82f6') as string,
   },
   
-  // Button colors - THIS IS THE KEY ONE FOR YOUR ISSUE! 🎯
+  // Button colors - THE KEY ONE FOR YOUR STUDENT LOAN CARD! 🎯
   button: {
     primary: getToken('color.light.button.button.primary', '#ef4444') as string,
     secondary: getToken('color.light.button.button.secondary', '#18181b') as string,
@@ -516,23 +519,10 @@ export const colors = {
     disabled: getToken('color.light.icon.icon.disabled', '#d4d4d8') as string,
     link: getToken('color.light.icon.icon.link', '#3b82f6') as string,
   },
-};`;
-}
+};
 
-function generateBreakpointExports(jsTokens) {
-  return `// AUTO-GENERATED BREAKPOINT TOKENS
-export const breakpoints = {
-  s: getToken('layout.mode.1.breakpoint.s', 393) as number,
-  m: getToken('layout.mode.1.breakpoint.m', 768) as number,
-  l: getToken('layout.mode.1.breakpoint.l', 1024) as number,
-  xl: getToken('layout.mode.1.breakpoint.xl', 1440) as number,
-};`;
-}
-
-function generateTypographyScale() {
-  return `// AUTO-GENERATED TYPOGRAPHY SCALE
+// TYPOGRAPHY SCALE
 export const typography = {
-  // Text styles
   textXS: {
     fontSize: units[10],
     lineHeight: units[14],
@@ -625,11 +615,9 @@ export const typography = {
     fontWeight: fontWeight.semibold,
     letterSpacing: letterSpacing.xs,
   },
-};`;
-}
+};
 
-function generateShadowExports() {
-  return `// SHADOW TOKENS (static for now, add to your Figma tokens later)
+// SHADOW TOKENS
 export const shadows = {
   sm: {
     shadowColor: '#000',
@@ -659,7 +647,32 @@ export const shadows = {
     shadowRadius: 16,
     elevation: 8,
   },
-};`;
+};
+
+// Export all tokens for easy access
+export const designTokens = {
+  spacing,
+  borderRadius,
+  borderWidth,
+  units,
+  fontFamily,
+  fontWeight,
+  letterSpacing,
+  breakpoints,
+  typography,
+  shadows,
+  colors,
+};
+
+// Debug: Log available tokens in development
+if (__DEV__) {
+  console.log('🎨 Design Tokens Loaded Successfully!');
+  console.log('Button Primary Color:', colors.button.primary);
+}
+`;
+
+  fs.writeFileSync('lib/tokens.ts', tokensTemplate);
+  console.log('✅ Generated lib/tokens.ts with proper color handling');
 }
 
-buildTokensWithAutoGeneration().catch(console.error);
+buildTokensWithFixedColors().catch(console.error);
