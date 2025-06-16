@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useRouter } from 'expo-router';
-import { View } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import Animated, { FadeInUp, FadeOutDown, LayoutAnimationConfig } from 'react-native-reanimated';
 import { Info } from '~/lib/icons/Info';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
@@ -16,32 +16,12 @@ import {
 import { Progress } from '~/components/ui/progress';
 import { Text } from '~/components/ui/text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip';
+import { spacing, borderRadius, borderWidth, units } from '~/lib/tokens';
 
 const router = useRouter();
 
 const GITHUB_AVATAR_URI =
   'https://i.pinimg.com/originals/ef/a2/8d/efa28d18a04e7fa40ed49eeb0ab660db.jpg';
-
-// In development, you can toggle between app and Storybook
-const StorybookToggle = () => {
-  if (!__DEV__) return null;
-  
-  const toggleStorybook = () => {
-    // This would require app restart to take effect
-    // You'll need to manually change SHOW_STORYBOOK in index.js and restart
-    alert('To view Storybook:\n1. Set SHOW_STORYBOOK=true in index.js\n2. Restart the app');
-  };
-
-  return (
-    <Button 
-      variant="outline" 
-      className="mt-4"
-      onPress={toggleStorybook}
-    >
-      <Text>📚 View Storybook</Text>
-    </Button>
-  );
-};
 
 export default function Screen() {
   const [progress, setProgress] = React.useState(78);
@@ -51,64 +31,64 @@ export default function Screen() {
   }
   
   return (
-    <View className='flex-1 justify-center items-center gap-5 p-6 bg-secondary/30'>
-      <Card className='w-full max-w-sm p-6 rounded-2xl'>
-        <CardHeader className='items-center'>
-          <Avatar alt="Rick Sanchez's Avatar" className='w-24 h-24'>
+    <View style={styles.container}>
+      <Card style={styles.card}>
+        <CardHeader style={styles.cardHeader}>
+          <Avatar style={styles.avatar}>
             <AvatarImage source={{ uri: GITHUB_AVATAR_URI }} />
             <AvatarFallback>
               <Text>RS</Text>
             </AvatarFallback>
           </Avatar>
-          <View className='p-3' />
-          <CardTitle className='pb-2 text-center'>Rick Sanchez</CardTitle>
-          <View className='flex-row'>
-            <CardDescription className='text-base font-semibold'>Scientist</CardDescription>
+          <View style={styles.spacer} />
+          <CardTitle style={styles.cardTitle}>Rick Sanchez</CardTitle>
+          <View style={styles.titleRow}>
+            <CardDescription style={styles.profession}>Scientist</CardDescription>
             <Tooltip delayDuration={150}>
-              <TooltipTrigger className='px-2 pb-0.5 active:opacity-50'>
-                <Info size={14} strokeWidth={2.5} className='w-4 h-4 text-foreground/70' />
+              <TooltipTrigger style={styles.tooltipTrigger}>
+                <Info size={14} strokeWidth={2.5} style={styles.infoIcon} />
               </TooltipTrigger>
-              <TooltipContent className='py-2 px-4 shadow'>
-                <Text className='native:text-lg'>Freelance</Text>
+              <TooltipContent style={styles.tooltipContent}>
+                <Text style={styles.tooltipText}>Freelance</Text>
               </TooltipContent>
             </Tooltip>
           </View>
         </CardHeader>
         <CardContent>
-          <View className='flex-row justify-around gap-3'>
-            <View className='items-center'>
-              <Text className='text-sm text-muted-foreground'>Dimension</Text>
-              <Text className='text-xl font-semibold'>C-137</Text>
+          <View style={styles.statsRow}>
+            <View style={styles.statItem}>
+              <Text style={styles.statLabel}>Dimension</Text>
+              <Text style={styles.statValue}>C-137</Text>
             </View>
-            <View className='items-center'>
-              <Text className='text-sm text-muted-foreground'>Age</Text>
-              <Text className='text-xl font-semibold'>70</Text>
+            <View style={styles.statItem}>
+              <Text style={styles.statLabel}>Age</Text>
+              <Text style={styles.statValue}>70</Text>
             </View>
-            <View className='items-center'>
-              <Text className='text-sm text-muted-foreground'>Species</Text>
-              <Text className='text-xl font-semibold'>Human</Text>
+            <View style={styles.statItem}>
+              <Text style={styles.statLabel}>Species</Text>
+              <Text style={styles.statValue}>Human</Text>
             </View>
           </View>
         </CardContent>
-        <CardFooter className='flex-col gap-3 pb-0'>
-          <View className='flex-row items-center overflow-hidden'>
-            <Text className='text-sm text-muted-foreground'>Productivity:</Text>
+        <CardFooter style={styles.cardFooter}>
+          <View style={styles.progressRow}>
+            <Text style={styles.progressLabel}>Productivity:</Text>
             <LayoutAnimationConfig skipEntering>
               <Animated.View
                 key={progress}
                 entering={FadeInUp}
                 exiting={FadeOutDown}
-                className='w-11 items-center'
+                style={styles.progressValue}
               >
-                <Text className='text-sm font-bold text-sky-600'>{progress}%</Text>
+                <Text style={styles.progressText}>{progress}%</Text>
               </Animated.View>
             </LayoutAnimationConfig>
           </View>
-          <Progress value={progress} className='h-2' indicatorClassName='bg-sky-600' />
-          <View />
+          <Progress value={progress} style={styles.progress} />
+          <View style={styles.spacer} />
           <Button
             variant='outline'
-            className='shadow shadow-foreground/5'
+            style={styles.updateButton}
             onPress={updateProgressValue}
           >
             <Text>Update</Text>
@@ -116,35 +96,143 @@ export default function Screen() {
         </CardFooter>
       </Card>
       
-      <StorybookToggle />
-      
-      <View style={{
-        marginTop: 24,
-        padding: 'var(--spacing-mode-1-space-l, 16px)',
-        backgroundColor: '#f1f5f9',
-        borderRadius: 'var(--border-mode-1-radius-s, 8px)',
-        borderWidth: 'var(--border-mode-1-width-xs, 1px)',
-        borderColor: '#e2e8f0',
-        alignItems: 'center',
-        maxWidth: 'calc(100% - 48px)',
-      }}>
-        <Text style={{ 
-          fontSize: 16, 
-          fontWeight: '600', 
-          color: '#1e293b',
-          marginBottom: 8
-        }}>
-          🎨 Token Studio Test
-        </Text>
-        <Text style={{ 
-          fontSize: 14, 
-          color: '#64748b',
-          textAlign: 'center'
-        }}>
-          This element uses spacing token: var(--spacing-mode-1-space-l)
-          {'\n'}Current value should be 16px
+      <View style={styles.tokenTest}>
+        <Text style={styles.tokenTitle}>🎨 Token Studio Integration</Text>
+        <Text style={styles.tokenDescription}>
+          This app now uses your Figma design tokens!
+          {'\n'}• Spacing: {spacing.l}px (--spacing-mode-1-space-l)
+          {'\n'}• Border Radius: {borderRadius.s}px (--border-mode-1-radius-s)
+          {'\n'}• Border Width: {borderWidth.xs}px (--border-mode-1-width-xs)
         </Text>
       </View> 
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: spacing.l,                  // 16px from your tokens
+    padding: spacing.xl,             // 24px from your tokens
+    backgroundColor: '#f8fafc',
+  },
+  card: {
+    width: '100%',
+    maxWidth: 384,
+    padding: spacing.xl,             // 24px from your tokens
+    borderRadius: borderRadius.l,    // 16px from your tokens
+  },
+  cardHeader: {
+    alignItems: 'center',
+  },
+  avatar: {
+    width: units[96],                // 96px from your tokens
+    height: units[96],               // 96px from your tokens
+  },
+  spacer: {
+    height: spacing.m,               // 12px from your tokens
+  },
+  cardTitle: {
+    paddingBottom: spacing.s,        // 8px from your tokens
+    textAlign: 'center',
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profession: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  tooltipTrigger: {
+    paddingHorizontal: spacing.s,    // 8px from your tokens
+    paddingBottom: spacing.xs,       // 4px from your tokens (converted to 2)
+  },
+  infoIcon: {
+    width: units[16],                // 16px from your tokens
+    height: units[16],               // 16px from your tokens
+    color: '#71717a',
+  },
+  tooltipContent: {
+    paddingVertical: spacing.s,      // 8px from your tokens
+    paddingHorizontal: spacing.l,    // 16px from your tokens
+  },
+  tooltipText: {
+    fontSize: 18,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    gap: spacing.m,                  // 12px from your tokens
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statLabel: {
+    fontSize: 14,
+    color: '#71717a',
+    marginBottom: spacing.xs,        // 4px from your tokens
+  },
+  statValue: {
+    fontSize: 20,
+    fontWeight: '600',
+  },
+  cardFooter: {
+    flexDirection: 'column',
+    gap: spacing.m,                  // 12px from your tokens
+    paddingBottom: 0,
+  },
+  progressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  progressLabel: {
+    fontSize: 14,
+    color: '#71717a',
+    marginRight: spacing.s,          // 8px from your tokens
+  },
+  progressValue: {
+    width: units[48],                // 48px from your tokens (wider for readability)
+    alignItems: 'center',
+  },
+  progressText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#0ea5e9',
+  },
+  progress: {
+    height: spacing.s,               // 8px from your tokens
+  },
+  updateButton: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  tokenTest: {
+    marginTop: spacing.xl,           // 24px from your tokens
+    padding: spacing.l,              // 16px from your tokens
+    backgroundColor: '#f1f5f9',
+    borderRadius: borderRadius.s,    // 8px from your tokens
+    borderWidth: borderWidth.xs,     // 1px from your tokens
+    borderColor: '#e2e8f0',
+    alignItems: 'center',
+    maxWidth: '90%',
+  },
+  tokenTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: spacing.s,         // 8px from your tokens
+  },
+  tokenDescription: {
+    fontSize: 14,
+    color: '#64748b',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+});

@@ -2,7 +2,7 @@ import { registerRootComponent } from 'expo';
 
 // 🎯 TOGGLE BETWEEN APP AND STORYBOOK
 // Change this line to switch between your app and Storybook:
-const SHOW_STORYBOOK = __DEV__ && true; // 👈 Set to 'true' for Storybook, 'false' for your app
+const SHOW_STORYBOOK = __DEV__ && false; // 👈 Set to 'true' for Storybook, 'false' for your app
 
 if (SHOW_STORYBOOK) {
   // 📚 STORYBOOK MODE

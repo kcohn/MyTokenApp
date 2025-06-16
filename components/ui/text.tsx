@@ -1,26 +1,35 @@
-import * as Slot from '@rn-primitives/slot';
 import * as React from 'react';
-import { Text as RNText } from 'react-native';
-import { cn } from '~/lib/utils';
+import { Text as RNText, StyleSheet, TextStyle } from 'react-native';
 
-const TextClassContext = React.createContext<string | undefined>(undefined);
+const TextClassContext = React.createContext<TextStyle | undefined>(undefined);
 
 function Text({
-  className,
-  asChild = false,
+  style,
+  children,
+  className, // Keep for compatibility
   ...props
 }: React.ComponentProps<typeof RNText> & {
   ref?: React.RefObject<RNText>;
-  asChild?: boolean;
+  className?: string;
 }) {
-  const textClass = React.useContext(TextClassContext);
-  const Component = asChild ? Slot.Text : RNText;
+  const textClassStyle = React.useContext(TextClassContext);
+  
   return (
-    <Component
-      className={cn('text-base text-foreground web:select-text', textClass, className)}
+    <RNText
+      style={[styles.base, textClassStyle, style]}
       {...props}
-    />
+    >
+      {children}
+    </RNText>
   );
 }
+
+const styles = StyleSheet.create({
+  base: {
+    fontSize: 16,
+    color: '#18181b',
+    lineHeight: 24,
+  },
+});
 
 export { Text, TextClassContext };
